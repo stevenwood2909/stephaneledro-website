@@ -25,15 +25,16 @@ const AudioPlayer = () => {
     toggleMute,
     currentTrackIndex,
     tracks,
-    currentTrackPosition,
-    setCurrentTrackPosition,
+    currentTrackProgress,
+    setCurrentTrackProgress,
   } = usePlayer();
-
+  const [progress, setProgress] = useState(0);
+  const [duration, setDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { language } = useLanguage();
 
   const currentPercentage = currentTrack
-    ? (currentTrackPosition / currentTrack.duration) * 100
+    ? (currentTrackProgress / currentTrack.duration) * 100
     : 0;
   console.log('current percentage = %D', currentPercentage);
 
@@ -61,8 +62,7 @@ const AudioPlayer = () => {
     if (audioRef.current) {
       audioRef.current.currentTime = newTime as number;
     }
-    console.log('newTime => ' + newTime);
-    setCurrentTrackPosition(newTime as number);
+   
   };
   useEffect(() => {
     if (currentTrack && audioRef.current) {
@@ -148,13 +148,14 @@ const AudioPlayer = () => {
           </div>
 
           <div className="flex items-center gap-1 mt-1">
-            <span className="text-xs text-zinc-400 w-8 text-right"></span>
-
+            <span className="text-xs text-zinc-400 w-8 text-right">
+              {formatTime(progress)}
+            </span>
             <input
               type="range"
               min="0"
-              max="100"
-              value={currentPercentage}
+              max={duration || 0}
+              value={progress}
               onChange={(e) => handleSeeking(e.target.value)}
               // onMouseDown={handleProgressStart}
               // onMouseUp={handleProgressEnd}
@@ -164,7 +165,7 @@ const AudioPlayer = () => {
             />
             <span className="text-xs text-zinc-400 w-8">
               {
-                //formatTime(duration)
+                formatTime(duration)
               }
             </span>
           </div>
