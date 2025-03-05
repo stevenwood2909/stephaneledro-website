@@ -1,13 +1,76 @@
-import React from 'react';
+import React, { useState } from 'react';
+import Alert from '@mui/material/Alert';
+import { useEffect } from 'react';
 import { Mail, Phone, Send } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 
 const Contact = () => {
   const { t } = useLanguage();
 
-  const handleSubmit = (e: React.FormEvent) => {
+
+  const [msg, setMessage] = useState("");
+  const [severity, setSeverity] = useState ("success");
+  const [showPopUp, setShowPopUp] = useState(false);
+  const showPopupHandler = () => setShowPopUp(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+    setShowPopUp(false);
+  }, 5000);
+ return () => clearTimeout(timer);
+ }, [showPopUp]);
+
+ let popup = null;
+  if(showPopUp) {
+    switch (severity) {
+      case "error":
+        popup = <Alert variant="filled" severity="error" >    
+  {msg}
+</Alert> 
+        break;
+    
+      default: // 
+      popup = <Alert variant="filled" severity="success" >    
+      {msg}
+    </Alert> 
+        break;
+    }
+    
+   }
+
+  
+
+
+const [visibleAlert, setVisibleAlert] = useState(false);
+  
+  const handleSubmit =  async  (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Handle form submission
+
+    const formData = new FormData(e.currentTarget);
+
+    formData.append("access_key", "8a44c5b6-aab0-4202-9698-4e14f2dd0463");
+
+    const response = await fetch("https://api.web3forms.com/submit", {
+      method: "POST",
+      body: formData
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      setSeverity("success");
+      setMessage("Email successfully  sent!");
+      showPopupHandler();
+
+    } else {
+      setSeverity("error");
+      setMessage(data? data.message : "");
+      
+
+      showPopupHandler();
+
+    }
+    
   };
 
   return (
@@ -37,7 +100,7 @@ const Contact = () => {
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form id="contactForm" onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="name" className="block text-sm font-medium mb-2">
                 {t('contact.name')}
@@ -45,6 +108,7 @@ const Contact = () => {
               <input
                 type="text"
                 id="name"
+                name="name"
                 className="w-full px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-lg focus:outline-none focus:border-yellow-500 transition-colors"
                 required
               />
@@ -57,6 +121,7 @@ const Contact = () => {
               <input
                 type="email"
                 id="email"
+                name="email"
                 className="w-full px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-lg focus:outline-none focus:border-yellow-500 transition-colors"
                 required
               />
@@ -71,6 +136,7 @@ const Contact = () => {
               </label>
               <textarea
                 id="message"
+                name="message"
                 rows={4}
                 className="w-full px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-lg focus:outline-none focus:border-yellow-500 transition-colors"
                 required
@@ -85,6 +151,7 @@ const Contact = () => {
               <span>{t('contact.send')}</span>
             </button>
           </form>
+          {popup}
         </div>
       </div>
     </section>

@@ -29,8 +29,8 @@ interface PlayerContextType {
   previousTrack: () => void;
   setVolume: (volume: number) => void;
   toggleMute: () => void;
-  currentTrackPosition: number;
-  setCurrentTrackPosition: (currentTrackPosition: number) => void;
+  currentTrackProgress: number;
+  setCurrentTrackProgress: (currentTrackProgress: number) => void;
 }
 
 const PlayerContext = createContext<PlayerContextType | undefined>(undefined);
@@ -45,7 +45,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const [volume, setVolume] = useState(1);
-  const [currentTrackPosition, setCurrentTrackPosition] = useState(0);
+  const [currentTrackProgress, setCurrentTrackProgress] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
 
   // fetching track list from supabase
@@ -74,7 +74,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (audioRef.current) {
-      audioRef.current.currentTime = currentTrackPosition;
+      audioRef.current.currentTime = currentTrackProgress;
       console.log(
         ' here srcCurrentposition ==> ' + audioRef.current.currentTime
       );
@@ -105,7 +105,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
       }
     }
     // reset ttrack position
-    setCurrentTrackPosition(0);
+    setCurrentTrackProgress(0);
   };
 
   const previousTrack = () => {
@@ -121,7 +121,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
       }
     }
     // reset ttrack position
-    setCurrentTrackPosition(0);
+    setCurrentTrackProgress(0);
   };
 
   const handleVolumeChange = (newVolume: number) => {
@@ -132,7 +132,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const handleTrackPosition = (newPosition: number) => {
-    setCurrentTrackPosition((currentTrack.duration * newPosition) / 100);
+    setCurrentTrackProgress((currentTrack.duration * newPosition) / 100);
     if (audioRef.current) {
       audioRef.current.currentTime =
         (currentTrack.duration * newPosition) / 100;
@@ -166,8 +166,8 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
         previousTrack,
         setVolume: handleVolumeChange,
         toggleMute,
-        currentTrackPosition,
-        setCurrentTrackPosition: handleTrackPosition,
+        currentTrackProgress,
+        setCurrentTrackProgress: handleTrackPosition,
       }}
     >
       <audio
