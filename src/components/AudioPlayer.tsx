@@ -188,13 +188,15 @@ const AudioPlayer = () => {
             {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
           </button>
 
-          <Slider
+          <Slider sx={{
+    color: 'success.main'
+  }}
             value={[volume]}
             min={0}
             max={1}
             step={0.01}
             onChange={handleVolumeChange}
-            className="w-24"
+            className="w-24 "
           />
         </div>
       </div>
